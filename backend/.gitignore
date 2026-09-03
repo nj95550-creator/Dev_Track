@@ -1,0 +1,9 @@
+# Excludes locally installed dependency packages.
+node_modules/
+
+# Excludes JavaScript files generated from TypeScript builds.
+dist/
+
+# Prevents private database credentials from being committed to Git.
+.env
+.env.test

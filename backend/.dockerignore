@@ -1,0 +1,18 @@
+# Exclude local secrets from the Docker build context.
+.env
+.env.*
+
+# Exclude dependencies that are installed in the image with npm ci.
+node_modules
+
+# Exclude generated build output; the image builds dist from source.
+dist
+
+# Exclude tests and coverage artifacts from the production image context.
+test
+coverage
+
+# Exclude local logs and repository metadata.
+npm-debug.log*
+.git
+.gitignore

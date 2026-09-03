@@ -1,0 +1,15 @@
+# Exclude dependencies installed in the image with npm ci.
+node_modules
+
+# Exclude generated build and test coverage output.
+dist
+coverage
+
+# Exclude local environment files and secrets from the build context.
+.env
+.env.*
+
+# Exclude local logs and repository metadata.
+npm-debug.log*
+.git
+.gitignore

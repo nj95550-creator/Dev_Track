@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    // Uses modern JavaScript features supported by current browsers.
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // Configures TypeScript for React and Vite.
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["vite/client"],
+
+    // Enables strict checking without generating duplicate build files.
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "allowJs": false,
+
+    // Supports standard package and JSON imports.
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src", "vite.config.ts"]
+}
