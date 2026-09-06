@@ -38,6 +38,8 @@ import {
 const HOST = process.env.HOST ?? "localhost";
 const PORT = 3000;
 const MAX_REQUEST_BODY_SIZE = 1_000_000;
+const SWAGGER_USERNAME = process.env.SWAGGER_USERNAME ?? "swagger";
+const SWAGGER_PASSWORD = process.env.SWAGGER_PASSWORD;
 
 // These records separate database-only authentication fields from public output.
 interface UserRecord extends QueryResultRow {
@@ -291,6 +293,36 @@ function isPositiveInteger(value: unknown): value is number {
     Number.isInteger(value) &&
     value > 0
   );
+}
+
+function isSwaggerAuthorized(request: IncomingMessage): boolean {
+  if (!SWAGGER_PASSWORD) {
+    return false;
+  }
+
+  const authorization = request.headers.authorization;
+
+  if (!authorization?.startsWith("Basic ")) {
+    return false;
+  }
+
+  const credentials = Buffer.from(
+    authorization.slice("Basic ".length),
+    "base64"
+  ).toString("utf8");
+
+  return credentials === `${SWAGGER_USERNAME}:${SWAGGER_PASSWORD}`;
+}
+
+function sendSwaggerUnauthorized(response: ServerResponse): void {
+  response.writeHead(401, {
+    "Content-Type": "application/json; charset=utf-8",
+    "WWW-Authenticate": 'Basic realm="DevTrack Swagger"',
+    "Cache-Control": "no-store",
+  });
+  response.end(JSON.stringify({
+    error: "Swagger authentication is required.",
+  }));
 }
 
 // Request validators reject malformed or out-of-range values before database access.
@@ -777,6 +809,17 @@ async function handleRequest(
       `http://${request.headers.host ?? `${HOST}:${PORT}`}`
     );
     const path = requestUrl.pathname;
+
+    const isSwaggerRequest =
+      path === "/openapi.json" ||
+      path === "/api-docs" ||
+      path === "/api-docs/" ||
+      path.startsWith("/api-docs/");
+
+    if (isSwaggerRequest && !isSwaggerAuthorized(request)) {
+      sendSwaggerUnauthorized(response);
+      return;
+    }
 
     // Service routes expose health, the welcome payload, and API documentation.
     if (method === "GET" && path === "/") {
