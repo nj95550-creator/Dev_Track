@@ -1,0 +1,61 @@
+# CI definition for source checks, Chromium workflows, Docker upgrades and
+# external PostgreSQL concurrency/permission tests. Each job uses disposable data.
+name: DevTrack checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+# Build/lint and execute isolated application plus browser checks.
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm run setup
+      - run: npm run check
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:ui
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failure-details
+          path: test-results/
+          retention-days: 7
+# Exercise real fresh/legacy Docker volumes and production container settings.
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm run verify:docker
+# Verify real locks, credentials and upgrades on both supported test server versions.
+  postgres:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        postgres: ['17', '18']
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_fixture_only
+          POSTGRES_DB: postgres
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DEVTRACK_POSTGRES_TEST_URL: postgresql://postgres:postgres_fixture_only@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm run setup
+      - run: npm run build
+      - run: npm run test:postgres
