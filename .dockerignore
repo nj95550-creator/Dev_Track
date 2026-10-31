@@ -1,0 +1,18 @@
+# Keep private/runtime/generated content out of the Docker build context.
+# The image rebuilds compiled assets from source rather than copying local builds.
+**/node_modules
+**/dist
+**/.env*
+!**/.env.example
+.git
+backend/data
+original
+.openai
+*.zip
+*.log
+
+release
+test-results
+playwright-report
+
+frontend/public/source/

@@ -1,0 +1,22 @@
+# Keep local credentials, installed packages, persisted databases and generated
+# outputs out of version control. Environment templates remain reviewable.
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+**/.env
+.env
+.env.*
+**/.env.*
+!.env.example
+!**/.env.example
+backend/data/
+*.log
+.DS_Store
+.openai/
+
+release/
+test-results/
+playwright-report/
+
+frontend/public/source/
