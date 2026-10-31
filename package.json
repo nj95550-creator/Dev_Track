@@ -1,0 +1,31 @@
+{
+  "name": "devtrack",
+  "version": "2.2.0",
+  "private": true,
+  "description": "A full-stack personal workspace for development projects and learning goals",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/check.mjs build",
+    "test": "npm --prefix backend test",
+    "check": "node scripts/check.mjs check",
+    "start": "npm --prefix backend start",
+    "db:migrate": "npm --prefix backend run db:migrate",
+    "format": "node frontend/node_modules/prettier/bin/prettier.cjs --write backend/src backend/test frontend/src scripts tests playwright.config.ts docs README.md",
+    "test:ui": "playwright test",
+    "test:ui:install": "playwright install chromium",
+    "account:reset": "npm --prefix backend run account:reset --",
+    "package": "npm run build && node scripts/package.mjs",
+    "test:postgres": "node scripts/postgres-test.mjs",
+    "verify:docker": "node scripts/verify-docker.mjs",
+    "db:provision": "npm --prefix backend run db:provision"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1",
+    "fflate": "0.8.3"
+  }
+}

@@ -1,0 +1,11 @@
+# Production overrides for the same app/setup/database topology. Supply a real
+# HTTPS origin and private credentials; use behind a trusted HTTPS reverse proxy.
+services:
+  app:
+    environment:
+      NODE_ENV: production
+      APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN to your HTTPS website origin}
+      # Apply migrations once as a release step before starting a new version.
+      AUTO_MIGRATE: 'false'
+      ENABLE_SWAGGER: ${ENABLE_SWAGGER:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}

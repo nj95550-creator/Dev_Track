@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Self-hosted API explorer shell. Assets come from the local Swagger allowlist; swagger-init.js handles same-origin cookies and CSRF. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DevTrack API · Swagger</title>
+    <link rel="stylesheet" href="./swagger-ui.css" />
+  </head>
+  <body>
+    <header
+      style="
+        max-width: 1460px;
+        margin: 24px auto;
+        padding: 0 20px;
+        font:
+          16px/1.6 system-ui,
+          sans-serif;
+      "
+    >
+      <a href="/">← Back to DevTrack</a>
+      <p>
+        Sign in on DevTrack, or execute <strong>POST /api/demo</strong> below to start a sample
+        workspace. Cookies and security tokens are handled automatically. Requests change real data
+        in the signed-in account.
+      </p>
+    </header>
+    <div id="swagger-ui"></div>
+    <script src="./swagger-ui-bundle.js"></script>
+    <script src="./swagger-init.js"></script>
+  </body>
+</html>

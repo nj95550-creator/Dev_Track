@@ -1,0 +1,32 @@
+{
+  "name": "devtrack-api",
+  "version": "2.2.0",
+  "license": "ISC",
+  "dependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "dotenv": "^17.4.2",
+    "nodemailer": "^10.1.7",
+    "pg": "^8.23.0",
+    "swagger-ui-dist": "5.34.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/nodemailer": "^7.0.0",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.12",
+    "typescript": "^6.0.0"
+  },
+  "private": true,
+  "type": "commonjs",
+  "description": "DevTrack API with PostgreSQL and secure cookie sessions",
+  "scripts": {
+    "dev": "node --import tsx --watch src/server.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/server.js",
+    "test": "node --import tsx --test test/*.test.ts",
+    "db:migrate": "node --import tsx src/migrate.ts",
+    "account:reset": "node --import tsx src/recoverAccount.ts",
+    "db:provision": "node --import tsx src/provisionDatabase.ts"
+  }
+}

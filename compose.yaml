@@ -1,0 +1,75 @@
+# Local Docker topology: persistent PostgreSQL, an owner-only setup job, then
+# the restricted app login. Keep the project name and existing volume on upgrades.
+services:
+# Owner credentials remain on the database/setup services; the database port is not published.
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: devtrack
+      POSTGRES_USER: devtrack
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in your shell or root .env}
+    volumes:
+      - devtrack-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U devtrack -d devtrack']
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 15
+# Run schema/grants on every applicable release, including existing populated volumes.
+  database-setup:
+    build: .
+    restart: 'no'
+    command: ['node', 'dist/provisionDatabase.js']
+    environment:
+      NODE_ENV: development
+      AUTO_MIGRATE: 'false'
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: devtrack
+      DB_USER: devtrack
+      DB_PASSWORD: ${DB_PASSWORD}
+      APP_DB_USER: ${APP_DB_USER:-devtrack_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Set APP_DB_PASSWORD to a separate random password (24+ characters)}
+    read_only: true
+    tmpfs: ['/tmp']
+    cap_drop: ['ALL']
+    security_opt: ['no-new-privileges:true']
+    depends_on:
+      database:
+        condition: service_healthy
+# Start only after setup succeeds, using APP_DB_PASSWORD rather than the owner password.
+  app:
+    build: .
+    restart: unless-stopped
+    ports: ['127.0.0.1:${APP_PORT:-3000}:3000']
+    environment:
+      # Local HTTP only. compose.production.yaml restores HTTPS + Secure cookies.
+      NODE_ENV: development
+      APP_ORIGIN: http://localhost:${APP_PORT:-3000}
+      HOST: 0.0.0.0
+      PORT: 3000
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: devtrack
+      DB_USER: ${APP_DB_USER:-devtrack_app}
+      DB_PASSWORD: ${APP_DB_PASSWORD}
+      AUTO_MIGRATE: 'false'
+      TRUST_PROXY: 'false'
+      ENABLE_SWAGGER: 'true'
+      SESSION_NAMESPACE: docker
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    read_only: true
+    tmpfs: ['/tmp']
+    cap_drop: ['ALL']
+    security_opt: ['no-new-privileges:true']
+    depends_on:
+      database-setup:
+        condition: service_completed_successfully
+volumes:
+  devtrack-db:

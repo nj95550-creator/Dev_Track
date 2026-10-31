@@ -1,0 +1,2008 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DevTrack API",
+    "version": "2.2.0",
+    "description": "Interactive DevTrack API. Sign in on the website in this browser, or execute POST /api/demo for an isolated sample workspace. Swagger automatically sends the session cookie and fetches a fresh CSRF token before protected changes. Requests modify the current account\u2019s real data. Production documentation is disabled unless ENABLE_SWAGGER=true."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "summary": "Database readiness",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                },
+                "example": {
+                  "status": "ok",
+                  "database": "connected"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_health",
+        "tags": [
+          "Service"
+        ]
+      }
+    },
+    "/api/config": {
+      "get": {
+        "summary": "Recovery availability",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Configuration"
+                },
+                "example": {
+                  "recoveryAvailable": true
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_config",
+        "tags": [
+          "Service"
+        ]
+      }
+    },
+    "/api/users": {
+      "post": {
+        "summary": "Create account and session",
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "username": "portfolio_tester",
+                    "name": "Portfolio Tester",
+                    "email": "tester@example.test",
+                    "isDemo": false,
+                    "createdAt": "2026-10-01T12:00:00.000Z"
+                  },
+                  "csrfToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly, SameSite=Lax session cookie, rotated on sign-in/password changes and cleared on logout/reset. Local Node and Docker use distinct names. Production adds Secure and uses __Host-devtrack.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Signup"
+              },
+              "example": {
+                "username": "your_test_username",
+                "name": "Your name",
+                "email": "you@example.com",
+                "password": "replace with your own long passphrase"
+              }
+            }
+          }
+        },
+        "operationId": "post_users",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Sign in and rotate session",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "username": "portfolio_tester",
+                    "name": "Portfolio Tester",
+                    "email": "tester@example.test",
+                    "isDemo": false,
+                    "createdAt": "2026-10-01T12:00:00.000Z"
+                  },
+                  "csrfToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly, SameSite=Lax session cookie, rotated on sign-in/password changes and cleared on logout/reset. Local Node and Docker use distinct names. Production adds Secure and uses __Host-devtrack.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              },
+              "example": {
+                "username": "your_username",
+                "password": "enter your own account password",
+                "remember": false
+              }
+            }
+          }
+        },
+        "operationId": "post_login",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/demo": {
+      "post": {
+        "summary": "Create isolated demo account",
+        "security": [],
+        "responses": {
+          "201": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "username": "demo_example",
+                    "name": "Alex Morgan",
+                    "email": "example@demo.invalid",
+                    "isDemo": true,
+                    "createdAt": "2026-10-01T12:00:00.000Z"
+                  },
+                  "csrfToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly, SameSite=Lax session cookie, rotated on sign-in/password changes and cleared on logout/reset. Local Node and Docker use distinct names. Production adds Secure and uses __Host-devtrack.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "post_demo",
+        "tags": [
+          "Authentication"
+        ],
+        "description": "Creates and signs into a new isolated demo workspace. This replaces the current browser session; it does not delete your personal account."
+      }
+    },
+    "/api/session": {
+      "get": {
+        "summary": "Current user and CSRF token",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Session"
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "username": "portfolio_tester",
+                    "name": "Portfolio Tester",
+                    "email": "tester@example.test",
+                    "isDemo": false,
+                    "createdAt": "2026-10-01T12:00:00.000Z"
+                  },
+                  "csrfToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_session",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "summary": "Invalidate current session",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "Signed out successfully."
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly, SameSite=Lax session cookie, rotated on sign-in/password changes and cleared on logout/reset. Local Node and Docker use distinct names. Production adds Secure and uses __Host-devtrack.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          }
+        ],
+        "operationId": "post_logout",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/me": {
+      "patch": {
+        "summary": "Update profile",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                },
+                "example": {
+                  "user": {
+                    "id": 1,
+                    "username": "portfolio_tester",
+                    "name": "Portfolio Tester",
+                    "email": "tester@example.test",
+                    "isDemo": false,
+                    "createdAt": "2026-10-01T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Profile"
+              }
+            }
+          }
+        },
+        "operationId": "patch_me",
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/api/password": {
+      "post": {
+        "summary": "Change password and rotate sessions",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResponse"
+                },
+                "example": {
+                  "message": "Password updated. Other sessions have been signed out.",
+                  "csrfToken": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly, SameSite=Lax session cookie, rotated on sign-in/password changes and cleared on logout/reset. Local Node and Docker use distinct names. Production adds Secure and uses __Host-devtrack.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Password"
+              }
+            }
+          }
+        },
+        "operationId": "post_password",
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/api/forgot-password": {
+      "post": {
+        "summary": "Request SMTP recovery",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "If an account matches that email, a reset link is on its way."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Recovery"
+              }
+            }
+          }
+        },
+        "operationId": "post_forgot_password",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/reset-password": {
+      "post": {
+        "summary": "Consume single-use recovery token",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "Password reset. You can now sign in."
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "HttpOnly, SameSite=Lax session cookie, rotated on sign-in/password changes and cleared on logout/reset. Local Node and Docker use distinct names. Production adds Secure and uses __Host-devtrack.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Reset"
+              }
+            }
+          }
+        },
+        "operationId": "post_reset_password",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/sample-data": {
+      "post": {
+        "summary": "Add example data to an empty workspace",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "Example workspace added."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          }
+        ],
+        "operationId": "post_sample_data",
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "summary": "List owned records",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectsResponse"
+                },
+                "example": {
+                  "projects": [
+                    {
+                      "id": 1,
+                      "userId": 1,
+                      "title": "Portfolio website",
+                      "description": "Track a personal project",
+                      "status": "in_progress",
+                      "priority": "medium",
+                      "progress": 40,
+                      "startDate": "2026-10-01",
+                      "targetDate": "2026-12-01",
+                      "technologies": "React, TypeScript",
+                      "repositoryUrl": "https://github.com/example/portfolio",
+                      "liveUrl": null,
+                      "createdAt": "2026-10-01T12:00:00.000Z",
+                      "updatedAt": "2026-10-02T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_projects",
+        "tags": [
+          "Projects"
+        ]
+      },
+      "post": {
+        "summary": "Create owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                },
+                "example": {
+                  "project": {
+                    "id": 1,
+                    "userId": 1,
+                    "title": "Portfolio website",
+                    "description": "Track a personal project",
+                    "status": "in_progress",
+                    "priority": "medium",
+                    "progress": 40,
+                    "startDate": "2026-10-01",
+                    "targetDate": "2026-12-01",
+                    "technologies": "React, TypeScript",
+                    "repositoryUrl": "https://github.com/example/portfolio",
+                    "liveUrl": null,
+                    "createdAt": "2026-10-01T12:00:00.000Z",
+                    "updatedAt": "2026-10-02T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ProjectInput"
+                  },
+                  {
+                    "required": [
+                      "title"
+                    ]
+                  }
+                ]
+              },
+              "example": {
+                "title": "Swagger test project",
+                "status": "planned",
+                "priority": "medium",
+                "progress": 0
+              }
+            }
+          }
+        },
+        "operationId": "post_projects",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "summary": "Read owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                },
+                "example": {
+                  "project": {
+                    "id": 1,
+                    "userId": 1,
+                    "title": "Portfolio website",
+                    "description": "Track a personal project",
+                    "status": "in_progress",
+                    "priority": "medium",
+                    "progress": 40,
+                    "startDate": "2026-10-01",
+                    "targetDate": "2026-12-01",
+                    "technologies": "React, TypeScript",
+                    "repositoryUrl": "https://github.com/example/portfolio",
+                    "liveUrl": null,
+                    "createdAt": "2026-10-01T12:00:00.000Z",
+                    "updatedAt": "2026-10-02T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "operationId": "get_projects_id",
+        "tags": [
+          "Projects"
+        ]
+      },
+      "patch": {
+        "summary": "Update owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                },
+                "example": {
+                  "project": {
+                    "id": 1,
+                    "userId": 1,
+                    "title": "Portfolio website",
+                    "description": "Track a personal project",
+                    "status": "in_progress",
+                    "priority": "medium",
+                    "progress": 40,
+                    "startDate": "2026-10-01",
+                    "targetDate": "2026-12-01",
+                    "technologies": "React, TypeScript",
+                    "repositoryUrl": "https://github.com/example/portfolio",
+                    "liveUrl": null,
+                    "createdAt": "2026-10-01T12:00:00.000Z",
+                    "updatedAt": "2026-10-02T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectInput"
+              }
+            }
+          }
+        },
+        "operationId": "patch_projects_id",
+        "tags": [
+          "Projects"
+        ]
+      },
+      "delete": {
+        "summary": "Delete owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "Project deleted successfully."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "operationId": "delete_projects_id",
+        "tags": [
+          "Projects"
+        ]
+      }
+    },
+    "/api/learning-goals": {
+      "get": {
+        "summary": "List owned records",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalsResponse"
+                },
+                "example": {
+                  "goals": [
+                    {
+                      "id": 1,
+                      "userId": 1,
+                      "title": "Practice TypeScript",
+                      "description": "Complete a small project",
+                      "status": "planned",
+                      "projectId": 1,
+                      "targetDate": "2026-12-01",
+                      "createdAt": "2026-10-01T12:00:00.000Z",
+                      "updatedAt": "2026-10-02T12:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get_learning_goals",
+        "tags": [
+          "Learning goals"
+        ]
+      },
+      "post": {
+        "summary": "Create owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponse"
+                },
+                "example": {
+                  "goal": {
+                    "id": 1,
+                    "userId": 1,
+                    "title": "Practice TypeScript",
+                    "description": "Complete a small project",
+                    "status": "planned",
+                    "projectId": 1,
+                    "targetDate": "2026-12-01",
+                    "createdAt": "2026-10-01T12:00:00.000Z",
+                    "updatedAt": "2026-10-02T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LearningGoalInput"
+                  },
+                  {
+                    "required": [
+                      "title"
+                    ]
+                  }
+                ]
+              },
+              "example": {
+                "title": "Swagger test goal",
+                "status": "planned"
+              }
+            }
+          }
+        },
+        "operationId": "post_learning_goals",
+        "tags": [
+          "Learning goals"
+        ]
+      }
+    },
+    "/api/learning-goals/{id}": {
+      "get": {
+        "summary": "Read owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponse"
+                },
+                "example": {
+                  "goal": {
+                    "id": 1,
+                    "userId": 1,
+                    "title": "Practice TypeScript",
+                    "description": "Complete a small project",
+                    "status": "planned",
+                    "projectId": 1,
+                    "targetDate": "2026-12-01",
+                    "createdAt": "2026-10-01T12:00:00.000Z",
+                    "updatedAt": "2026-10-02T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "operationId": "get_learning_goals_id",
+        "tags": [
+          "Learning goals"
+        ]
+      },
+      "patch": {
+        "summary": "Update owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoalResponse"
+                },
+                "example": {
+                  "goal": {
+                    "id": 1,
+                    "userId": 1,
+                    "title": "Practice TypeScript",
+                    "description": "Complete a small project",
+                    "status": "planned",
+                    "projectId": 1,
+                    "targetDate": "2026-12-01",
+                    "createdAt": "2026-10-01T12:00:00.000Z",
+                    "updatedAt": "2026-10-02T12:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LearningGoalInput"
+              }
+            }
+          }
+        },
+        "operationId": "patch_learning_goals_id",
+        "tags": [
+          "Learning goals"
+        ]
+      },
+      "delete": {
+        "summary": "Delete owned record",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "example": {
+                  "message": "Learning goal deleted successfully."
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Request error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Your session has ended. Please sign in again."
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "description": "Swagger supplies this automatically from the current session. Other clients must send a valid X-CSRF-Token for protected mutations."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "operationId": "delete_learning_goals_id",
+        "tags": [
+          "Learning goals"
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "devtrack_node_session",
+        "description": "HttpOnly session cookie managed by the browser. The served specification uses the actual cookie name for this launch mode. Do not paste cookie values into Swagger."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "password": {
+            "type": "string",
+            "minLength": 15,
+            "maxLength": 128
+          },
+          "remember": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "Signup": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{3,50}$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "A personal email address. The demo.invalid domain is reserved for temporary demos."
+          },
+          "password": {
+            "type": "string",
+            "minLength": 15,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "username",
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "Profile": {
+        "type": "object",
+        "required": [
+          "name",
+          "username"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "username": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{3,50}$"
+          }
+        }
+      },
+      "Password": {
+        "type": "object",
+        "required": [
+          "currentPassword",
+          "password"
+        ],
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 15,
+            "maxLength": 128
+          }
+        }
+      },
+      "Recovery": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "Reset": {
+        "type": "object",
+        "required": [
+          "token",
+          "password"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 15,
+            "maxLength": 128
+          }
+        }
+      },
+      "ProjectInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "progress": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "startDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "targetDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "technologies": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "repositoryUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "liveUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "maxLength": 2048
+          }
+        }
+      },
+      "LearningGoalInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed"
+            ]
+          },
+          "projectId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "targetDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "username": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "isDemo": {
+            "type": "boolean",
+            "description": "True only for explicitly created temporary demo accounts."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "name",
+          "email",
+          "isDemo",
+          "createdAt"
+        ]
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "userId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "progress": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "startDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "targetDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "technologies": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500
+          },
+          "repositoryUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "liveUrl": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uri",
+            "maxLength": 2048
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "title",
+          "description",
+          "status",
+          "priority",
+          "progress",
+          "startDate",
+          "targetDate",
+          "technologies",
+          "repositoryUrl",
+          "liveUrl",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "LearningGoal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "userId": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 150
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_progress",
+              "completed"
+            ]
+          },
+          "projectId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
+          },
+          "targetDate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "title",
+          "description",
+          "status",
+          "projectId",
+          "targetDate",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "csrfToken": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "user",
+          "csrfToken"
+        ]
+      },
+      "ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "user"
+        ]
+      },
+      "PasswordResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "csrfToken": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "required": [
+          "message",
+          "csrfToken"
+        ]
+      },
+      "ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "project": {
+            "$ref": "#/components/schemas/Project"
+          }
+        },
+        "required": [
+          "project"
+        ]
+      },
+      "ProjectsResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            }
+          }
+        },
+        "required": [
+          "projects"
+        ]
+      },
+      "GoalResponse": {
+        "type": "object",
+        "properties": {
+          "goal": {
+            "$ref": "#/components/schemas/LearningGoal"
+          }
+        },
+        "required": [
+          "goal"
+        ]
+      },
+      "GoalsResponse": {
+        "type": "object",
+        "properties": {
+          "goals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LearningGoal"
+            }
+          }
+        },
+        "required": [
+          "goals"
+        ]
+      },
+      "Health": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "ok"
+          },
+          "database": {
+            "type": "string",
+            "const": "connected"
+          }
+        },
+        "required": [
+          "status",
+          "database"
+        ]
+      },
+      "Configuration": {
+        "type": "object",
+        "properties": {
+          "recoveryAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "recoveryAvailable"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Service"
+    },
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "Account"
+    },
+    {
+      "name": "Projects"
+    },
+    {
+      "name": "Learning goals"
+    }
+  ]
+}

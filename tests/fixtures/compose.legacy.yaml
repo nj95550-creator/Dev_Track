@@ -1,0 +1,36 @@
+# Verification fixture only: reproduce the former owner-login deployment so
+# the upgrade suite can populate and retain its named volume before migration.
+# Test fixture for the previous release's owner-login installation. Never deploy.
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: devtrack
+      POSTGRES_USER: devtrack
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Disposable test credential required}
+    volumes: ['devtrack-db:/var/lib/postgresql/data']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U devtrack -d devtrack']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+  app:
+    build: ../..
+    ports: ['127.0.0.1:${APP_PORT}:3000']
+    environment:
+      NODE_ENV: development
+      APP_ORIGIN: http://localhost:${APP_PORT}
+      HOST: 0.0.0.0
+      PORT: 3000
+      DB_HOST: database
+      DB_NAME: devtrack
+      DB_USER: devtrack
+      DB_PASSWORD: ${DB_PASSWORD}
+      AUTO_MIGRATE: 'true'
+      ENABLE_SWAGGER: 'true'
+      SESSION_NAMESPACE: docker
+    depends_on:
+      database:
+        condition: service_healthy
+volumes:
+  devtrack-db:

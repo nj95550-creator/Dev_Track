@@ -1,0 +1,76 @@
+/*
+ * Browser baseline: self-hosted fonts, sizing, inherited control typography and
+ * visible keyboard focus. App.css owns themes and component layouts; these
+ * resets keep native elements consistent before those component rules apply.
+ */
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.5;
+}
+a {
+  color: inherit;
+}
+svg {
+  flex-shrink: 0;
+}
+button {
+  color: inherit;
+}
+input,
+textarea,
+select {
+  min-width: 0;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #d97b44;
+  outline-offset: 3px;
+}
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+button {
+  border: 0;
+}
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+::selection {
+  background: #f8ceaf;
+  color: #29241f;
+}

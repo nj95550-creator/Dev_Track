@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- React document shell. Vite loads the browser entry; Node replaces the origin marker in built sharing tags using APP_ORIGIN. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8f9fa" />
+    <meta
+      name="description"
+      content="DevTrack is your personal development workspace. Organize projects, build new skills, and turn good ideas into visible progress."
+    />
+    <!-- Absolute sharing URLs are filled at serving time; no public host is hard-coded. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DevTrack" />
+    <meta property="og:title" content="DevTrack · Projects, progress, and learning goals" />
+    <meta property="og:description" content="A full-stack developer workspace built with React, TypeScript, Node.js, and PostgreSQL. Try an isolated demo without signing up." />
+    <meta property="og:url" content="__DEVTRACK_ORIGIN__/" />
+    <meta property="og:image" content="__DEVTRACK_ORIGIN__/screenshots/share.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="DevTrack dashboard with sample projects and learning goals" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DevTrack · Projects, progress, and learning goals" />
+    <meta name="twitter:description" content="A developer workspace with an editable, isolated demo. Built with React, TypeScript, Node.js, and PostgreSQL." />
+    <meta name="twitter:image" content="__DEVTRACK_ORIGIN__/screenshots/share.png" />
+    <meta name="twitter:image:alt" content="DevTrack dashboard with sample projects and learning goals" />
+    <link rel="canonical" href="__DEVTRACK_ORIGIN__/" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <title>DevTrack · Projects, progress, and learning goals</title>
+  </head>
+  <body>
+    <!-- main.tsx mounts App and its render-error boundary into this element. -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
